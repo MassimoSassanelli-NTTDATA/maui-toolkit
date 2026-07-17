@@ -1,0 +1,24 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # The job name must be exactly `copilot-setup-steps` for GitHub Copilot setup steps.
+  copilot-setup-steps:
+    uses: MassimoSassanelli-NTTDATA/mobile-maintenance-platform/.github/workflows/copilot-platform-setup.yml@main
+    with:
+      platform_repository: MassimoSassanelli-NTTDATA/mobile-maintenance-platform
+      platform_ref: main
+      platform_config_path: .github/copilot-platform.json
+      default_branch: develop
+      checkout_mode: dependency-closure
+      workspace_root: mobile-maintenance-platform
+    secrets:
+      MULTI_REPO_TOKEN: ${{ secrets.MULTI_REPO_TOKEN }}
