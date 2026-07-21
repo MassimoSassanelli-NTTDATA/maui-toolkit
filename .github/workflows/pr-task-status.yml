@@ -1,0 +1,15 @@
+name: PR Task Status
+
+# Moves the linked task issue through its review states based on this PR.
+# Delegates to the reusable workflow in the platform repository so the logic
+# stays centralized. The PR must reference its task issue with a closing
+# keyword, e.g. "Closes #123".
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+
+jobs:
+  status:
+    uses: MassimoSassanelli-NTTDATA/mms-solution/.github/workflows/pr-task-status.yml@main
+    secrets: inherit
