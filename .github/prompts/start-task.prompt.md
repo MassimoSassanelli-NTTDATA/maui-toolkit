@@ -9,3 +9,6 @@ Conflict rule: platform instructions control orchestration and dependency direct
 
 
 Prioritize the current repository's local `AGENTS.md`, skills, ADRs and docs over platform-level implementation assumptions.
+
+## Implementation Workflow
+When implementing code, follow the TDD workflow defined in `.github/instructions/tdd.instructions.md` (write failing tests first, then Red-Green-Refactor).

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Ndbs.MauiToolkit</RootNamespace>
+	</PropertyGroup>
+
+	<!--
+		Platform-neutral core of the toolkit. Contains no MAUI dependency so it can be
+		project-referenced from runnable, platform-neutral unit test projects. The
+		MAUI-facing assembly (Ndbs.MauiToolkit) references this project and adds the
+		MAUI implementations (Preferences/FileSystem, UI components, DI wiring).
+	-->
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+	</ItemGroup>
+
+</Project>

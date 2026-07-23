@@ -31,4 +31,8 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\Ndbs.MauiToolkit.Core\Ndbs.MauiToolkit.Core.csproj" />
+	</ItemGroup>
+
 </Project>

@@ -36,15 +36,27 @@ targets a specific local bug, file, symbol, or runtime behavior.
 
 ## Tech baseline
 
-- .NET 10 MAUI (`net10.0-android|ios|windows`), `Nullable` + `ImplicitUsings` enabled.
+- Two assemblies:
+  - `Ndbs.MauiToolkit.Core` (`net10.0`, no MAUI dependency) — platform-neutral logic
+    (diff utilities, environments, context chain, messaging, and the `IKeyValueStore`
+    / `IAppDataRootProvider` abstractions). Project-referenceable from platform-neutral
+    unit test projects.
+  - `Ndbs.MauiToolkit` (`net10.0-android|ios|windows`) — references Core and adds the
+    MAUI implementations (MVVM bases, Shell navigation, dialogs, icons, `Preferences`
+    / `FileSystem` defaults, and DI wiring).
+- `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
-- Root namespace `Ndbs.MauiToolkit`, one namespace per feature area.
+- Root namespace `Ndbs.MauiToolkit`, one namespace per feature area. Namespaces are
+  shared across both assemblies (an area lives in exactly one of them).
 
 ## Setup
 
-1. Reference the project (checked out as a sibling directory):
-   `src/Ndbs.MauiToolkit/Ndbs.MauiToolkit.csproj`.
+1. Reference the projects (checked out as a sibling directory):
+   - App / MAUI consumers: `src/Ndbs.MauiToolkit/Ndbs.MauiToolkit.csproj`
+     (transitively pulls in `Ndbs.MauiToolkit.Core`).
+   - Platform-neutral test/library consumers that only need the core logic:
+     `src/Ndbs.MauiToolkit.Core/Ndbs.MauiToolkit.Core.csproj`.
 2. Register the default services in `MauiProgram`:
 
    ```csharp

@@ -9,30 +9,14 @@
 	</PropertyGroup>
 
 	<!--
-		The Ndbs.MauiToolkit library targets platform frameworks (net10.0-android)
-		and cannot be project-referenced from a runnable, platform-neutral unit
-		test project. The platform-neutral parts of the library (diff utilities,
-		environment infrastructure, startup and context helpers) are compiled
-		(shared-source) into this test assembly. MAUI-specific defaults
-		(Preferences/FileSystem) and DI wiring are excluded.
+		The platform-neutral core of the toolkit lives in Ndbs.MauiToolkit.Core
+		(TargetFramework net10.0, no MAUI dependency) and is referenced directly.
+		MAUI-specific implementations (Preferences/FileSystem, UI components and DI
+		wiring) live in the Ndbs.MauiToolkit project and are intentionally not
+		referenced here.
 	-->
 	<ItemGroup>
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Diff\DiffTypes.cs" Link="Toolkit\Diff\DiffTypes.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Diff\DiffDescription.cs" Link="Toolkit\Diff\DiffDescription.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Diff\ListDiffAnalyzer.cs" Link="Toolkit\Diff\ListDiffAnalyzer.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<!-- Environment infrastructure -->
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Environments\**\*.cs"
-		         Link="Toolkit\Environments\%(RecursiveDir)%(Filename)%(Extension)" />
-		<!-- Dependencies of the environment infrastructure -->
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Context\IUserContext.cs" Link="Toolkit\Context\IUserContext.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Context\UserContext.cs" Link="Toolkit\Context\UserContext.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Messaging\EnvironmentChangingMessage.cs" Link="Toolkit\Messaging\EnvironmentChangingMessage.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Messaging\EnvironmentChangedMessage.cs" Link="Toolkit\Messaging\EnvironmentChangedMessage.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Startup\IKeyValueStore.cs" Link="Toolkit\Startup\IKeyValueStore.cs" />
-		<Compile Include="..\..\src\maui-toolkit\Ndbs.MauiToolkit\Workspace\IAppDataRootProvider.cs" Link="Toolkit\Workspace\IAppDataRootProvider.cs" />
+		<ProjectReference Include="..\..\src\Ndbs.MauiToolkit.Core\Ndbs.MauiToolkit.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
