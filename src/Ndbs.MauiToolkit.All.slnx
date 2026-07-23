@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="../tests/Ndbs.MauiToolkit.Tests/Ndbs.MauiToolkit.Tests.csproj" />
+  </Folder>
+  <Project Path="Ndbs.MauiToolkit/Ndbs.MauiToolkit.csproj" />
+</Solution>
