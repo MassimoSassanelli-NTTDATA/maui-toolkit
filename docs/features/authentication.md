@@ -102,13 +102,15 @@ of that concern).
   plugs the IAS provider into the toolkit's environment services: on apply it
   reconfigures the authority and client id from the environment definition and
   activates the IAS provider through `IActiveIdentityProvider`; on tear-down it signs
-  the user out, so a session never survives an environment switch.
+  the user out only when the switch requests it (see `EnvironmentSwitchOptions`). By
+  default a session never survives an environment switch, but a caller can keep the
+  session alive across a switch.
 - `EntraIdpComponent` (an `ISystemEnvironmentComponent` in
   `Ndbs.MauiToolkit.Auth.Entra`) does the same for Azure Entra ID: on apply it sets
   the tenant authority and client id and activates the Entra/MSAL provider; on
-  tear-down it signs the user out. Because both components share the
-  `IdentityProvider` category, an environment must configure exactly one of IAS or
-  Entra — never both.
+  tear-down it signs the user out only when the switch requests it (see
+  `EnvironmentSwitchOptions`). Because both components share the `IdentityProvider`
+  category, an environment must configure exactly one of IAS or Entra — never both.
 
 ## Security
 

@@ -12,6 +12,7 @@ Core types:
 - `ISystemEnvironmentStartupResolver`
 - `ISystemEnvironmentSwitchCoordinator`
 - `ISystemEnvironmentComponent`
+- `EnvironmentSwitchOptions`
 
 ## When to Use
 
@@ -35,3 +36,8 @@ Provision -> Validate -> Persist -> Resolve Startup -> Switch
 - Validate before persisting.
 - Keep switch operations atomic from the app perspective.
 - Notify interested components via messaging after successful switch.
+- Use `SwitchAsync(target, EnvironmentSwitchOptions)` to decide per switch whether
+  session-scoped state is reset. The default (`SwitchAsync(target)`) performs a full
+  tear-down (`ResetActiveSession = true`); pass `ResetActiveSession = false` to keep
+  an active session across the switch. The core stays auth-agnostic — identity-provider
+  components interpret the intent (for example as "sign out or keep signed in").

@@ -97,8 +97,16 @@ namespace Ndbs.MauiToolkit.Auth.Entra
         }
 
         /// <inheritdoc />
-        public Task ResetAsync(CancellationToken cancellationToken = default) =>
-            _authenticationService.LogoutAsync(cancellationToken: cancellationToken);
+        public Task ResetAsync(EnvironmentSwitchOptions options, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(options);
+
+            // Only sign out when the switch asks for the active session to be reset;
+            // otherwise the session is kept alive across the environment switch.
+            return options.ResetActiveSession
+                ? _authenticationService.LogoutAsync(cancellationToken: cancellationToken)
+                : Task.CompletedTask;
+        }
 
         private static EntraConfig? Read(JsonElement section)
         {

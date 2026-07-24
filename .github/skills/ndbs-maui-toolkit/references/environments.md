@@ -21,7 +21,9 @@ the concrete section types; pluggable components interpret their own sections.
   - `IsRequired`, `Order` (apply in order, reset in reverse order).
   - `EnvironmentComponentValidation Validate(JsonElement section)`.
   - `Task ApplyAsync(section, ct)` — only when the target contains `SectionKey`.
-  - `Task ResetAsync(ct)` — always called during a switch, regardless of the target.
+  - `Task ResetAsync(EnvironmentSwitchOptions options, ct)` — always called during a
+    switch, regardless of the target; `options.ResetActiveSession` tells the component
+    whether to tear down session-scoped state (for example sign out) or keep it.
 
 ## Services
 
@@ -47,6 +49,10 @@ the concrete section types; pluggable components interpret their own sections.
     validate → publish `EnvironmentChangingMessage` → reset all components (reverse
     order) → apply present sections (order) → persist active selection → publish
     `EnvironmentChangedMessage`.
+  - `Task<EnvironmentSwitchResult> SwitchAsync(target, EnvironmentSwitchOptions, ct)` —
+    same flow, but the caller decides per switch whether session-scoped state is reset
+    (`EnvironmentSwitchOptions.ResetActiveSession`, default `true`). The core stays
+    auth-agnostic; identity-provider components interpret the intent.
   - `Task ApplyActiveAsync(environment, ct)` — startup re-apply of an already-active
     environment **without** tear-down (no logout, no cache clearing) and without
     changing the persisted selection.

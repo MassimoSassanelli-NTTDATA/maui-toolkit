@@ -83,7 +83,7 @@ namespace Ndbs.MauiToolkit.Auth.Entra.Tests
             public int Order => 10;
             public EnvironmentComponentValidation Validate(JsonElement section) => EnvironmentComponentValidation.Valid();
             public Task ApplyAsync(JsonElement section, CancellationToken cancellationToken = default) => Task.CompletedTask;
-            public Task ResetAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+            public Task ResetAsync(EnvironmentSwitchOptions options, CancellationToken cancellationToken = default) => Task.CompletedTask;
         }
     }
 }

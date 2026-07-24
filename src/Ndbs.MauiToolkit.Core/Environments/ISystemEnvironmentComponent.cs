@@ -59,9 +59,11 @@ namespace Ndbs.MauiToolkit.Environments
         /// Tears down any state established for the previously active environment (for
         /// example signing out or clearing environment-scoped caches). Always called
         /// during a controlled switch, regardless of whether the target environment
-        /// contains this component's section.
+        /// contains this component's section. The <paramref name="options"/> carry the
+        /// caller's intent (for example whether an active user session should be reset).
         /// </summary>
+        /// <param name="options">The switch options describing the caller's intent.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task ResetAsync(CancellationToken cancellationToken = default);
+        Task ResetAsync(EnvironmentSwitchOptions options, CancellationToken cancellationToken = default);
     }
 }

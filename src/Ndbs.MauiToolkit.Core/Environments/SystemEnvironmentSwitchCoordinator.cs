@@ -37,9 +37,14 @@ namespace Ndbs.MauiToolkit.Environments
         }
 
         /// <inheritdoc />
-        public async Task<EnvironmentSwitchResult> SwitchAsync(SystemEnvironment target, CancellationToken cancellationToken = default)
+        public Task<EnvironmentSwitchResult> SwitchAsync(SystemEnvironment target, CancellationToken cancellationToken = default) =>
+            SwitchAsync(target, EnvironmentSwitchOptions.Default, cancellationToken);
+
+        /// <inheritdoc />
+        public async Task<EnvironmentSwitchResult> SwitchAsync(SystemEnvironment target, EnvironmentSwitchOptions options, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(options);
 
             var validation = _validator.Validate(target);
             if (!validation.IsValid)
@@ -51,10 +56,11 @@ namespace Ndbs.MauiToolkit.Environments
             _messenger.Send(new EnvironmentChangingMessage(previous, target));
 
             // Tear down the current environment first (reverse order), so a stale
-            // session or environment-scoped cache can never survive the switch.
+            // session or environment-scoped cache can never survive the switch. The
+            // caller's options decide how thorough the tear-down is.
             foreach (var component in _componentsInApplyOrder.Reverse())
             {
-                await component.ResetAsync(cancellationToken).ConfigureAwait(false);
+                await component.ResetAsync(options, cancellationToken).ConfigureAwait(false);
             }
 
             await ApplyComponentsAsync(target, cancellationToken).ConfigureAwait(false);

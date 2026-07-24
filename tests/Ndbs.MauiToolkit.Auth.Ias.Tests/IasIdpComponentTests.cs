@@ -2,6 +2,7 @@ using System.Text.Json;
 using Ndbs.MauiToolkit.Auth.Configuration;
 using Ndbs.MauiToolkit.Auth.Ias;
 using Ndbs.MauiToolkit.Auth.Providers;
+using Ndbs.MauiToolkit.Environments;
 using NSubstitute;
 using Xunit;
 
@@ -74,14 +75,25 @@ namespace Ndbs.MauiToolkit.Auth.Ias.Tests
         }
 
         [Fact]
-        public async Task ResetAsync_SignsOut()
+        public async Task ResetAsync_ResetActiveSession_SignsOut()
         {
             var authService = Substitute.For<IAuthenticationService>();
             var component = new IasIdpComponent(OptionsProvider(), authService, new ActiveIdentityProvider());
 
-            await component.ResetAsync();
+            await component.ResetAsync(new EnvironmentSwitchOptions { ResetActiveSession = true });
 
             await authService.Received(1).LogoutAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ResetAsync_KeepSession_DoesNotSignOut()
+        {
+            var authService = Substitute.For<IAuthenticationService>();
+            var component = new IasIdpComponent(OptionsProvider(), authService, new ActiveIdentityProvider());
+
+            await component.ResetAsync(new EnvironmentSwitchOptions { ResetActiveSession = false });
+
+            await authService.DidNotReceive().LogoutAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>());
         }
     }
 }
