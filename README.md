@@ -41,6 +41,9 @@ Use this toolkit when your MAUI app needs:
 - Workspace abstraction
   - app-data root provider abstractions for testable file operations
   - Docs: [docs/features/workspace-abstraction.md](docs/features/workspace-abstraction.md)
+- Dynamic tables (optional assembly `Ndbs.MauiToolkit.DynamicTables`)
+  - runtime SQLite table creation and CSV import over an existing EF Core `DbContext`
+  - Docs: [docs/features/dynamic-tables.md](docs/features/dynamic-tables.md)
 
 ## Developer Documentation
 
@@ -51,6 +54,7 @@ Use this toolkit when your MAUI app needs:
 - [docs/features/icons.md](docs/features/icons.md)
 - [docs/features/diff-utilities.md](docs/features/diff-utilities.md)
 - [docs/features/workspace-abstraction.md](docs/features/workspace-abstraction.md)
+- [docs/features/dynamic-tables.md](docs/features/dynamic-tables.md)
 
 ## Quick Start
 

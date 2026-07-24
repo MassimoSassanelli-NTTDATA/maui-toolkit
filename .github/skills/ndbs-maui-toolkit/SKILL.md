@@ -8,8 +8,10 @@ description: >
   INavigationService, IDialogService, UseMauiNdbsToolkit DI registration,
   IContextChain (User -> Tenant -> MicroApp -> Form), SystemEnvironment
   provisioning + switching, PlatformIconView / AppIconCatalog, ListDiffAnalyzer,
-  IKeyValueStore, IAppDataRootProvider. DO NOT USE FOR: application-specific domain
-  logic or HTTP/REST/OData clients.
+  IKeyValueStore, IAppDataRootProvider, and the optional DynamicTables assembly
+  (runtime SQLite tables + CSV import: IDynamicTableRepository,
+  IDynamicTableImportService, IDynamicTableMemoryCache, AddDynamicTables). DO NOT USE
+  FOR: application-specific domain logic or HTTP/REST/OData clients.
 ---
 
 # Ndbs.MauiToolkit
@@ -36,7 +38,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 
 ## Tech baseline
 
-- Two assemblies:
+- Two core assemblies plus one optional add-on assembly:
   - `Ndbs.MauiToolkit.Core` (`net10.0`, no MAUI dependency) — platform-neutral logic
     (diff utilities, environments, context chain, messaging, and the `IKeyValueStore`
     / `IAppDataRootProvider` abstractions). Project-referenceable from platform-neutral
@@ -44,11 +46,16 @@ targets a specific local bug, file, symbol, or runtime behavior.
   - `Ndbs.MauiToolkit` (`net10.0-android|ios|windows`) — references Core and adds the
     MAUI implementations (MVVM bases, Shell navigation, dialogs, icons, `Preferences`
     / `FileSystem` defaults, and DI wiring).
+  - `Ndbs.MauiToolkit.DynamicTables` (`net10.0`, no MAUI dependency) — **optional**
+    add-on for runtime SQLite table creation and CSV import over an existing EF Core
+    `DbContext`. Depends on `Microsoft.EntityFrameworkCore.Sqlite` and `CsvHelper`;
+    reference it only from apps that need dynamic tabular import. It is independent
+    of Core and the MAUI assembly (no project reference between them).
 - `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
 - Root namespace `Ndbs.MauiToolkit`, one namespace per feature area. Namespaces are
-  shared across both assemblies (an area lives in exactly one of them).
+  shared across the assemblies (an area lives in exactly one of them).
 
 ## Setup
 
@@ -57,6 +64,8 @@ targets a specific local bug, file, symbol, or runtime behavior.
      (transitively pulls in `Ndbs.MauiToolkit.Core`).
    - Platform-neutral test/library consumers that only need the core logic:
      `src/Ndbs.MauiToolkit.Core/Ndbs.MauiToolkit.Core.csproj`.
+   - Optional, only when importing dynamic tabular data:
+     `src/Ndbs.MauiToolkit.DynamicTables/Ndbs.MauiToolkit.DynamicTables.csproj`.
 2. Register the default services in `MauiProgram`:
 
    ```csharp
@@ -75,7 +84,8 @@ targets a specific local bug, file, symbol, or runtime behavior.
 4. **Not** auto-registered — register in the app when you need them:
    `IKeyValueStore` → `PreferencesKeyValueStore`,
    `IAppDataRootProvider` → `MauiAppDataRootProvider`,
-   the context chain (`AddContextChain()` + stages), and the environment services.
+   the context chain (`AddContextChain()` + stages), the environment services, and
+   the optional dynamic tables (`AddDynamicTables<TContext>()`).
 
 ## Capability map
 
@@ -90,6 +100,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 | **Icons** (`Ndbs.MauiToolkit.Icons`) | Platform-native icons (SF Symbols on iOS, Material Symbols on Android/Windows) | `PlatformIconView` (XAML: `IconKey`, `Size`, `Color`), `AppIconCatalog`, `IPlatformIconResolver`, `AddNdbsPlatformIconHandlers()` |
 | **Diff** (`Ndbs.MauiToolkit.Diff`) | Compare a remote and a local list into added / removed / changed / unchanged | `ListDiffAnalyzer<T>(idSelector, isChangedFunc).Calculate(remote, local)` → `DiffDescription<T>` (`DiffTypes`) |
 | **Workspace** (`Ndbs.MauiToolkit.Workspace`) | Abstracted app-data root path (testable over `FileSystem.AppDataDirectory`) | `IAppDataRootProvider` / `MauiAppDataRootProvider` |
+| **Dynamic tables** (`Ndbs.MauiToolkit.DynamicTables`, optional assembly) | Runtime SQLite table creation + CSV import over an existing EF Core `DbContext`; identifier-validated and parameterized against SQL injection | `AddDynamicTables<TContext>()`, `IDynamicTableRepository`, `IDynamicTableImportService`, `IDynamicTableMemoryCache`, `CsvParser`, `CsvImportOptions`, `CsvImportResult` — see `../../docs/features/dynamic-tables.md` |
 
 ## When to reach for what
 
@@ -106,6 +117,10 @@ targets a specific local bug, file, symbol, or runtime behavior.
 - **Multiple backend/identity environments, QR onboarding, environment switch?**
   Use the environment services — read `references/environments.md` first.
 - **Sync reconciliation (local vs. remote list)?** Use `ListDiffAnalyzer<T>`.
+- **Import tabular data with an unknown-at-compile-time schema (e.g. user CSV)?**
+  Reference the optional `Ndbs.MauiToolkit.DynamicTables` assembly and use
+  `AddDynamicTables<TContext>()` with `IDynamicTableImportService`. Do not use it for
+  fixed, known domain schemas — model those as normal EF Core entities.
 
 ## Boundaries
 
