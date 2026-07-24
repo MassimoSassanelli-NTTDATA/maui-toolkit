@@ -19,6 +19,8 @@ Core types:
   `RoutingOidcClient`, `IdentityProviderOidcClient`
 - IAS provider (`Ndbs.MauiToolkit.Auth.Ias`): `AddIas()`, `DuendeOidcClient`,
   `IasIdpComponent`, `IasConfig`
+- Entra provider (`Ndbs.MauiToolkit.Auth.Entra`): `AddEntra()`, `MsalEntraClient`,
+  `IMsalPublicClient`, `EntraIdpComponent`, `EntraConfig`
 
 ## When to Use
 
@@ -45,6 +47,8 @@ of that concern).
   - `Ndbs.MauiToolkit.Auth.Ias` — SAP IAS via `Duende.IdentityModel.OidcClient`
     (Authorization Code Flow with PKCE) and the MAUI system browser; enabled with
     `AddIas()`.
+  - `Ndbs.MauiToolkit.Auth.Entra` — Azure Entra ID via `Microsoft.Identity.Client`
+    (MSAL.NET); enabled with `AddEntra()`.
 - Reference the base plus exactly the provider projects an app needs, so an
   IAS-only app never pulls in another provider's SDK.
 
@@ -99,6 +103,12 @@ of that concern).
   reconfigures the authority and client id from the environment definition and
   activates the IAS provider through `IActiveIdentityProvider`; on tear-down it signs
   the user out, so a session never survives an environment switch.
+- `EntraIdpComponent` (an `ISystemEnvironmentComponent` in
+  `Ndbs.MauiToolkit.Auth.Entra`) does the same for Azure Entra ID: on apply it sets
+  the tenant authority and client id and activates the Entra/MSAL provider; on
+  tear-down it signs the user out. Because both components share the
+  `IdentityProvider` category, an environment must configure exactly one of IAS or
+  Entra — never both.
 
 ## Security
 

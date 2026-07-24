@@ -68,6 +68,12 @@ targets a specific local bug, file, symbol, or runtime behavior.
     `IasIdpComponent`; enabled with `AddIas()`. References `Ndbs.MauiToolkit.Auth` and
     pulls in `Duende.IdentityModel.OidcClient`. Reference it only from apps that use
     SAP IAS.
+  - `Ndbs.MauiToolkit.Auth.Entra` (`net10.0-android|ios|windows`, `UseMaui`) —
+    **optional** Azure Entra ID identity-provider add-on for `Ndbs.MauiToolkit.Auth`.
+    Provides the MSAL-based `MsalEntraClient` (behind the `IMsalPublicClient` seam) and
+    `EntraIdpComponent`; enabled with `AddEntra()`. References `Ndbs.MauiToolkit.Auth`
+    and pulls in `Microsoft.Identity.Client` (MSAL.NET). Reference it only from apps
+    that use Azure Entra ID.
 - `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
@@ -120,7 +126,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 | **Diff** (`Ndbs.MauiToolkit.Diff`) | Compare a remote and a local list into added / removed / changed / unchanged | `ListDiffAnalyzer<T>(idSelector, isChangedFunc).Calculate(remote, local)` → `DiffDescription<T>` (`DiffTypes`) |
 | **Workspace** (`Ndbs.MauiToolkit.Workspace`) | Abstracted app-data root path (testable over `FileSystem.AppDataDirectory`) | `IAppDataRootProvider` / `MauiAppDataRootProvider` |
 | **Dynamic tables** (`Ndbs.MauiToolkit.DynamicTables`, optional assembly) | Runtime SQLite table creation + CSV import over an existing EF Core `DbContext`; identifier-validated and parameterized against SQL injection | `AddDynamicTables<TContext>()`, `IDynamicTableRepository`, `IDynamicTableImportService`, `IDynamicTableMemoryCache`, `CsvParser`, `CsvImportOptions`, `CsvImportResult` — see `../../docs/features/dynamic-tables.md` |
-| **Authentication** (`Ndbs.MauiToolkit.Auth` + provider add-ons) | Provider-agnostic OIDC sign-in: orchestration, secure token storage, silent refresh, profile mapping, sign-out, `HttpClient` bearer tokens and per-environment provider routing. Concrete providers are separate optional projects (SAP IAS in `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`); exactly one identity provider is active per environment | base: `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `IActiveIdentityProvider`, `RoutingOidcClient`, `IdentityProviderOidcClient`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage`; IAS: `AddIas()`, `IasIdpComponent` — see `../../docs/features/authentication.md` |
+| **Authentication** (`Ndbs.MauiToolkit.Auth` + provider add-ons) | Provider-agnostic OIDC sign-in: orchestration, secure token storage, silent refresh, profile mapping, sign-out, `HttpClient` bearer tokens and per-environment provider routing. Concrete providers are separate optional projects (SAP IAS in `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`; Azure Entra ID in `Ndbs.MauiToolkit.Auth.Entra` via `AddEntra()`); exactly one identity provider is active per environment | base: `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `IActiveIdentityProvider`, `RoutingOidcClient`, `IdentityProviderOidcClient`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage`; IAS: `AddIas()`, `IasIdpComponent`; Entra: `AddEntra()`, `MsalEntraClient`, `EntraIdpComponent` — see `../../docs/features/authentication.md` |
 
 ## When to reach for what
 
@@ -143,11 +149,12 @@ targets a specific local bug, file, symbol, or runtime behavior.
   fixed, known domain schemas — model those as normal EF Core entities.
 - **Sign users in against an OIDC identity provider (e.g. SAP IAS) and call protected
   APIs?** Reference the provider-agnostic `Ndbs.MauiToolkit.Auth` base plus the
-  provider add-on the app needs (SAP IAS: `Ndbs.MauiToolkit.Auth.Ias`), register with
-  `AddNdbsAuth(...).AddIas()`, drive the lifecycle through `IAuthenticationService`,
-  and attach tokens with `AddNdbsAuthBearerToken()`. Do not call the OIDC client or
-  platform browser directly, and do not use it as a REST/OData client — read
-  `../../docs/features/authentication.md` first.
+  provider add-on the app needs (SAP IAS: `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`;
+  Azure Entra ID: `Ndbs.MauiToolkit.Auth.Entra` via `AddEntra()`), register with
+  `AddNdbsAuth(...).AddIas()` (and/or `.AddEntra()`), drive the lifecycle through
+  `IAuthenticationService`, and attach tokens with `AddNdbsAuthBearerToken()`. Do not
+  call the OIDC client or platform browser directly, and do not use it as a REST/OData
+  client — read `../../docs/features/authentication.md` first.
 
 ## Boundaries
 

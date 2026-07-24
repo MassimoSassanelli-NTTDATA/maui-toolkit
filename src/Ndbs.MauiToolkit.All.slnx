@@ -4,10 +4,12 @@
     <Project Path="../tests/Ndbs.MauiToolkit.DynamicTables.Tests/Ndbs.MauiToolkit.DynamicTables.Tests.csproj" />
     <Project Path="../tests/Ndbs.MauiToolkit.Auth.Tests/Ndbs.MauiToolkit.Auth.Tests.csproj" />
     <Project Path="../tests/Ndbs.MauiToolkit.Auth.Ias.Tests/Ndbs.MauiToolkit.Auth.Ias.Tests.csproj" />
+    <Project Path="../tests/Ndbs.MauiToolkit.Auth.Entra.Tests/Ndbs.MauiToolkit.Auth.Entra.Tests.csproj" />
   </Folder>
   <Project Path="Ndbs.MauiToolkit.Core/Ndbs.MauiToolkit.Core.csproj" />
   <Project Path="Ndbs.MauiToolkit/Ndbs.MauiToolkit.csproj" />
   <Project Path="Ndbs.MauiToolkit.DynamicTables/Ndbs.MauiToolkit.DynamicTables.csproj" />
   <Project Path="Ndbs.MauiToolkit.Auth/Ndbs.MauiToolkit.Auth.csproj" />
   <Project Path="Ndbs.MauiToolkit.Auth.Ias/Ndbs.MauiToolkit.Auth.Ias.csproj" />
+  <Project Path="Ndbs.MauiToolkit.Auth.Entra/Ndbs.MauiToolkit.Auth.Entra.csproj" />
 </Solution>
