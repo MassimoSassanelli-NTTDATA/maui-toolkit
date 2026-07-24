@@ -44,6 +44,10 @@ Use this toolkit when your MAUI app needs:
 - Dynamic tables (optional assembly `Ndbs.MauiToolkit.DynamicTables`)
   - runtime SQLite table creation and CSV import over an existing EF Core `DbContext`
   - Docs: [docs/features/dynamic-tables.md](docs/features/dynamic-tables.md)
+- Authentication (optional assembly `Ndbs.MauiToolkit.Auth`)
+  - browser-based OIDC sign-in (Authorization Code Flow with PKCE), secure token
+    storage, silent refresh, profile mapping and `HttpClient` bearer-token wiring
+  - Docs: [docs/features/authentication.md](docs/features/authentication.md)
 
 ## Developer Documentation
 
@@ -55,6 +59,7 @@ Use this toolkit when your MAUI app needs:
 - [docs/features/diff-utilities.md](docs/features/diff-utilities.md)
 - [docs/features/workspace-abstraction.md](docs/features/workspace-abstraction.md)
 - [docs/features/dynamic-tables.md](docs/features/dynamic-tables.md)
+- [docs/features/authentication.md](docs/features/authentication.md)
 
 ## Quick Start
 

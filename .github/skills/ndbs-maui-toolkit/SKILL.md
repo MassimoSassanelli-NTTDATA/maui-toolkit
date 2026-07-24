@@ -8,9 +8,12 @@ description: >
   INavigationService, IDialogService, UseMauiNdbsToolkit DI registration,
   IContextChain (User -> Tenant -> MicroApp -> Form), SystemEnvironment
   provisioning + switching, PlatformIconView / AppIconCatalog, ListDiffAnalyzer,
-  IKeyValueStore, IAppDataRootProvider, and the optional DynamicTables assembly
+  IKeyValueStore, IAppDataRootProvider, the optional DynamicTables assembly
   (runtime SQLite tables + CSV import: IDynamicTableRepository,
-  IDynamicTableImportService, IDynamicTableMemoryCache, AddDynamicTables). DO NOT USE
+  IDynamicTableImportService, IDynamicTableMemoryCache, AddDynamicTables), and the
+  optional Auth assembly (browser-based OIDC sign-in with PKCE, secure token storage,
+  silent refresh, HttpClient bearer tokens: IAuthenticationService, OidcOptions,
+  AddNdbsAuth, AddNdbsAuthBearerToken, BearerTokenHandler). DO NOT USE
   FOR: application-specific domain logic or HTTP/REST/OData clients.
 ---
 
@@ -38,7 +41,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 
 ## Tech baseline
 
-- Two core assemblies plus one optional add-on assembly:
+- Two core assemblies plus two optional add-on assemblies:
   - `Ndbs.MauiToolkit.Core` (`net10.0`, no MAUI dependency) — platform-neutral logic
     (diff utilities, environments, context chain, messaging, and the `IKeyValueStore`
     / `IAppDataRootProvider` abstractions). Project-referenceable from platform-neutral
@@ -51,6 +54,11 @@ targets a specific local bug, file, symbol, or runtime behavior.
     `DbContext`. Depends on `Microsoft.EntityFrameworkCore.Sqlite` and `CsvHelper`;
     reference it only from apps that need dynamic tabular import. It is independent
     of Core and the MAUI assembly (no project reference between them).
+  - `Ndbs.MauiToolkit.Auth` (`net10.0-android|ios|windows`, `UseMaui`) — **optional**
+    add-on for browser-based OIDC sign-in (Authorization Code Flow with PKCE), secure
+    token storage, silent refresh, profile mapping and `HttpClient` bearer-token
+    wiring. References `Ndbs.MauiToolkit` (and transitively Core) and pulls in
+    `Duende.IdentityModel.OidcClient`; reference it only from apps that authenticate.
 - `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
@@ -84,8 +92,10 @@ targets a specific local bug, file, symbol, or runtime behavior.
 4. **Not** auto-registered — register in the app when you need them:
    `IKeyValueStore` → `PreferencesKeyValueStore`,
    `IAppDataRootProvider` → `MauiAppDataRootProvider`,
-   the context chain (`AddContextChain()` + stages), the environment services, and
-   the optional dynamic tables (`AddDynamicTables<TContext>()`).
+   the context chain (`AddContextChain()` + stages), the environment services,
+   the optional dynamic tables (`AddDynamicTables<TContext>()`), and the optional
+   authentication library (`AddNdbsAuth(...)`, plus `AddNdbsAuthBearerToken()` on an
+   `IHttpClientBuilder`).
 
 ## Capability map
 
@@ -101,6 +111,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 | **Diff** (`Ndbs.MauiToolkit.Diff`) | Compare a remote and a local list into added / removed / changed / unchanged | `ListDiffAnalyzer<T>(idSelector, isChangedFunc).Calculate(remote, local)` → `DiffDescription<T>` (`DiffTypes`) |
 | **Workspace** (`Ndbs.MauiToolkit.Workspace`) | Abstracted app-data root path (testable over `FileSystem.AppDataDirectory`) | `IAppDataRootProvider` / `MauiAppDataRootProvider` |
 | **Dynamic tables** (`Ndbs.MauiToolkit.DynamicTables`, optional assembly) | Runtime SQLite table creation + CSV import over an existing EF Core `DbContext`; identifier-validated and parameterized against SQL injection | `AddDynamicTables<TContext>()`, `IDynamicTableRepository`, `IDynamicTableImportService`, `IDynamicTableMemoryCache`, `CsvParser`, `CsvImportOptions`, `CsvImportResult` — see `../../docs/features/dynamic-tables.md` |
+| **Authentication** (`Ndbs.MauiToolkit.Auth`, optional assembly) | Browser-based OIDC sign-in (Authorization Code Flow with PKCE), secure token storage, silent refresh, profile mapping, sign-out and `HttpClient` bearer tokens; integrates with the environment services via `IasIdpComponent` | `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage` — see `../../docs/features/authentication.md` |
 
 ## When to reach for what
 
@@ -121,6 +132,12 @@ targets a specific local bug, file, symbol, or runtime behavior.
   Reference the optional `Ndbs.MauiToolkit.DynamicTables` assembly and use
   `AddDynamicTables<TContext>()` with `IDynamicTableImportService`. Do not use it for
   fixed, known domain schemas — model those as normal EF Core entities.
+- **Sign users in against an OIDC identity provider (e.g. SAP IAS) and call protected
+  APIs?** Reference the optional `Ndbs.MauiToolkit.Auth` assembly, register it with
+  `AddNdbsAuth(...)`, drive the lifecycle through `IAuthenticationService`, and attach
+  tokens with `AddNdbsAuthBearerToken()`. Do not call the OIDC client or platform
+  browser directly, and do not use it as a REST/OData client — read
+  `../../docs/features/authentication.md` first.
 
 ## Boundaries
 

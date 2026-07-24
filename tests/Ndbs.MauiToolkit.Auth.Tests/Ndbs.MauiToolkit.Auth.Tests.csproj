@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<!--
+		The Ndbs.MauiToolkit.Auth library targets platform frameworks
+		(net10.0-android/ios/windows) and cannot be project-referenced from a
+		runnable, platform-neutral unit test project. The units under test are the
+		platform-neutral parts of the library (configuration, token storage logic,
+		profile mapping, the authentication orchestrator and the HTTP handler), so
+		the relevant source files are compiled (shared-source) into this test
+		assembly. The MAUI-specific implementations (browser, secure storage), the
+		dependency-injection wiring and the Duende OIDC client adapter require a
+		platform/identity provider and are excluded here.
+	-->
+	<ItemGroup>
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth\**\*.cs"
+		         Exclude="..\..\src\Ndbs.MauiToolkit.Auth\Maui\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\DependencyInjection\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\Client\DuendeOidcClient.cs;..\..\src\Ndbs.MauiToolkit.Auth\Environments\Components\IasIdpComponent.cs;..\..\src\Ndbs.MauiToolkit.Auth\bin\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\obj\**\*.cs"
+		         Link="Auth\%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+		<PackageReference Include="NSubstitute" Version="5.3.0" />
+	</ItemGroup>
+
+</Project>

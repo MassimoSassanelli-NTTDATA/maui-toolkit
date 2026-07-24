@@ -2,8 +2,10 @@
   <Folder Name="/Tests/">
     <Project Path="../tests/Ndbs.MauiToolkit.Tests/Ndbs.MauiToolkit.Tests.csproj" />
     <Project Path="../tests/Ndbs.MauiToolkit.DynamicTables.Tests/Ndbs.MauiToolkit.DynamicTables.Tests.csproj" />
+    <Project Path="../tests/Ndbs.MauiToolkit.Auth.Tests/Ndbs.MauiToolkit.Auth.Tests.csproj" />
   </Folder>
   <Project Path="Ndbs.MauiToolkit.Core/Ndbs.MauiToolkit.Core.csproj" />
   <Project Path="Ndbs.MauiToolkit/Ndbs.MauiToolkit.csproj" />
   <Project Path="Ndbs.MauiToolkit.DynamicTables/Ndbs.MauiToolkit.DynamicTables.csproj" />
+  <Project Path="Ndbs.MauiToolkit.Auth/Ndbs.MauiToolkit.Auth.csproj" />
 </Solution>
