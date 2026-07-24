@@ -13,7 +13,10 @@ description: >
   IDynamicTableImportService, IDynamicTableMemoryCache, AddDynamicTables), and the
   optional Auth assembly (browser-based OIDC sign-in with PKCE, secure token storage,
   silent refresh, HttpClient bearer tokens: IAuthenticationService, OidcOptions,
-  AddNdbsAuth, AddNdbsAuthBearerToken, BearerTokenHandler). DO NOT USE
+  AddNdbsAuth, AddNdbsAuthBearerToken, BearerTokenHandler), and the optional
+  EventJournal assembly (curated technical event journaling with enrichment,
+  sanitization and sinks: AddEventJournal, IEventJournal, IEventSink,
+  IEventEnricher). DO NOT USE
   FOR: application-specific domain logic or HTTP/REST/OData clients.
 ---
 
@@ -41,7 +44,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 
 ## Tech baseline
 
-- Two core assemblies plus two optional add-on assemblies:
+- Two core assemblies plus optional add-on assemblies:
   - `Ndbs.MauiToolkit.Core` (`net10.0`, no MAUI dependency) — platform-neutral logic
     (diff utilities, environments, context chain, messaging, and the `IKeyValueStore`
     / `IAppDataRootProvider` abstractions). Project-referenceable from platform-neutral
@@ -74,6 +77,13 @@ targets a specific local bug, file, symbol, or runtime behavior.
     `EntraIdpComponent`; enabled with `AddEntra()`. References `Ndbs.MauiToolkit.Auth`
     and pulls in `Microsoft.Identity.Client` (MSAL.NET). Reference it only from apps
     that use Azure Entra ID.
+  - `Ndbs.MauiToolkit.EventJournal` (`net10.0`, no MAUI dependency) — **optional**
+    add-on for curated technical event journaling with context enrichment,
+    payload sanitization, sink fan-out (logger and SQLite) and bounded retention.
+    Depends on `Microsoft.Extensions.Logging.Abstractions`,
+    `Microsoft.Extensions.DependencyInjection.Abstractions`, and
+    `Microsoft.EntityFrameworkCore.Sqlite`. Reference it only from apps that need
+    runtime event journaling.
 - `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
@@ -109,8 +119,10 @@ targets a specific local bug, file, symbol, or runtime behavior.
    `IAppDataRootProvider` → `MauiAppDataRootProvider`,
    the context chain (`AddContextChain()` + stages), the environment services,
    the optional dynamic tables (`AddDynamicTables<TContext>()`), and the optional
-   authentication library (`AddNdbsAuth(...)` plus one provider add-on such as
+  authentication library (`AddNdbsAuth(...)` plus one provider add-on such as
    `AddIas()`, and `AddNdbsAuthBearerToken()` on an `IHttpClientBuilder`).
+  The optional event journal is also explicit opt-in via `AddEventJournal(...)`
+  and, when SQLite persistence is needed, `AddEventJournalDatabasePath(...)`.
 
 ## Capability map
 
@@ -127,6 +139,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 | **Workspace** (`Ndbs.MauiToolkit.Workspace`) | Abstracted app-data root path (testable over `FileSystem.AppDataDirectory`) | `IAppDataRootProvider` / `MauiAppDataRootProvider` |
 | **Dynamic tables** (`Ndbs.MauiToolkit.DynamicTables`, optional assembly) | Runtime SQLite table creation + CSV import over an existing EF Core `DbContext`; identifier-validated and parameterized against SQL injection | `AddDynamicTables<TContext>()`, `IDynamicTableRepository`, `IDynamicTableImportService`, `IDynamicTableMemoryCache`, `CsvParser`, `CsvImportOptions`, `CsvImportResult` — see `../../docs/features/dynamic-tables.md` |
 | **Authentication** (`Ndbs.MauiToolkit.Auth` + provider add-ons) | Provider-agnostic OIDC sign-in: orchestration, secure token storage, silent refresh, profile mapping, sign-out, `HttpClient` bearer tokens and per-environment provider routing. Concrete providers are separate optional projects (SAP IAS in `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`; Azure Entra ID in `Ndbs.MauiToolkit.Auth.Entra` via `AddEntra()`); exactly one identity provider is active per environment | base: `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `IActiveIdentityProvider`, `RoutingOidcClient`, `IdentityProviderOidcClient`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage`; IAS: `AddIas()`, `IasIdpComponent`; Entra: `AddEntra()`, `MsalEntraClient`, `EntraIdpComponent` — see `../../docs/features/authentication.md` |
+| **Event journal** (`Ndbs.MauiToolkit.EventJournal`, optional assembly) | Curated technical event journaling with category gating, enrichment, payload sanitization, sink fan-out, timed scopes and SQLite retention | `AddEventJournal(...)`, `AddEventJournalDatabasePath(...)`, `IEventJournal`, `IEventSink`, `IEventEnricher`, `IEventPayloadSanitizer`, `EventJournalOptions`, `EventJournalExtensions.RecordAsync` — see `../../docs/features/event-journal.md` |
 
 ## When to reach for what
 
@@ -147,6 +160,11 @@ targets a specific local bug, file, symbol, or runtime behavior.
   Reference the optional `Ndbs.MauiToolkit.DynamicTables` assembly and use
   `AddDynamicTables<TContext>()` with `IDynamicTableImportService`. Do not use it for
   fixed, known domain schemas — model those as normal EF Core entities.
+- **Need bounded runtime diagnostics/audit-style technical events?**
+  Reference the optional `Ndbs.MauiToolkit.EventJournal` assembly, register
+  `AddEventJournal(...)`, optionally add SQLite persistence with
+  `AddEventJournalDatabasePath(...)`, and write events through `IEventJournal`.
+  Do not use it as a business event-sourcing or BI analytics store.
 - **Sign users in against an OIDC identity provider (e.g. SAP IAS) and call protected
   APIs?** Reference the provider-agnostic `Ndbs.MauiToolkit.Auth` base plus the
   provider add-on the app needs (SAP IAS: `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`;

@@ -48,6 +48,10 @@ Use this toolkit when your MAUI app needs:
   - browser-based OIDC sign-in (Authorization Code Flow with PKCE), secure token
     storage, silent refresh, profile mapping and `HttpClient` bearer-token wiring
   - Docs: [docs/features/authentication.md](docs/features/authentication.md)
+- Event journal (optional assembly `Ndbs.MauiToolkit.EventJournal`)
+  - curated technical event journaling with enrichment, payload sanitization,
+    fan-out sinks (logger + SQLite) and retention controls
+  - Docs: [docs/features/event-journal.md](docs/features/event-journal.md)
 
 ## Developer Documentation
 
@@ -60,6 +64,7 @@ Use this toolkit when your MAUI app needs:
 - [docs/features/workspace-abstraction.md](docs/features/workspace-abstraction.md)
 - [docs/features/dynamic-tables.md](docs/features/dynamic-tables.md)
 - [docs/features/authentication.md](docs/features/authentication.md)
+- [docs/features/event-journal.md](docs/features/event-journal.md)
 
 ## Quick Start
 

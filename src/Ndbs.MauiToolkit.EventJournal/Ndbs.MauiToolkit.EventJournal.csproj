@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Ndbs.MauiToolkit.EventJournal is a platform-neutral (net10.0) library that
+    provides a curated, generic event journal: an immutable event envelope, a
+    pluggable set of sinks (logger, SQLite), payload sanitization, context
+    enrichment and retention. It deliberately has no dependency on MAUI or on the
+    XIA/tenant infrastructure so it can be reused across scenarios. The storage
+    location for the SQLite sink is supplied by the host through an injected
+    IEventJournalPathProvider (the tenant is optional and may be absent).
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+  </ItemGroup>
+
+</Project>
