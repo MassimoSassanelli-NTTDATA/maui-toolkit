@@ -2,7 +2,7 @@ using Duende.IdentityModel.OidcClient.Browser;
 using Ndbs.MauiToolkit.Auth.Configuration;
 using IBrowser = Duende.IdentityModel.OidcClient.Browser.IBrowser;
 
-namespace Ndbs.MauiToolkit.Auth.Maui
+namespace Ndbs.MauiToolkit.Auth.Ias
 {
     /// <summary>
     /// <see cref="IBrowser"/> that selects the concrete browser used for the

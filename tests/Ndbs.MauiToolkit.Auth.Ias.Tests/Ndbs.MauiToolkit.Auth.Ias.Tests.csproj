@@ -9,20 +9,25 @@
 	</PropertyGroup>
 
 	<!--
-		The Ndbs.MauiToolkit.Auth library targets platform frameworks
-		(net10.0-android/ios/windows) and cannot be project-referenced from a
-		runnable, platform-neutral unit test project. The units under test are the
-		platform-neutral parts of the library (configuration, token storage logic,
-		profile mapping, the authentication orchestrator and the HTTP handler), so
-		the relevant source files are compiled (shared-source) into this test
-		assembly. The MAUI-specific implementations (browser, secure storage), the
-		dependency-injection wiring and the Duende OIDC client adapter require a
-		platform/identity provider and are excluded here.
+		Ndbs.MauiToolkit.Auth.Ias targets platform frameworks and cannot be
+		project-referenced from a runnable, platform-neutral unit test project. The
+		platform-neutral units under test (the IAS environment component and its
+		configuration) are compiled (shared-source) into this test assembly, together
+		with the platform-neutral parts of the base Auth library they depend on. The
+		Duende client, the MAUI browsers and the DI wiring require a platform/identity
+		provider and are excluded here. The environment abstractions come from the
+		platform-neutral Ndbs.MauiToolkit.Core project reference.
 	-->
 	<ItemGroup>
 		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth\**\*.cs"
 		         Exclude="..\..\src\Ndbs.MauiToolkit.Auth\Maui\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\DependencyInjection\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\bin\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\obj\**\*.cs"
 		         Link="Auth\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Ias\IasIdpComponent.cs" Link="Ias\IasIdpComponent.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Ias\IasConfig.cs" Link="Ias\IasConfig.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Ndbs.MauiToolkit.Core\Ndbs.MauiToolkit.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

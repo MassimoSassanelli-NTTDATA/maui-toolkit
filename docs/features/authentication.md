@@ -15,6 +15,10 @@ Core types:
 - `UserProfile`, `AuthenticationResult`, `AuthenticationErrorCode`
 - `BearerTokenHandler`
 - `AddNdbsAuth(...)` and `AddNdbsAuthBearerToken()`
+- Provider routing (base): `IActiveIdentityProvider` / `ActiveIdentityProvider`,
+  `RoutingOidcClient`, `IdentityProviderOidcClient`
+- IAS provider (`Ndbs.MauiToolkit.Auth.Ias`): `AddIas()`, `DuendeOidcClient`,
+  `IasIdpComponent`, `IasConfig`
 
 ## When to Use
 
@@ -28,17 +32,28 @@ of that concern).
 
 ## Assembly and Dependencies
 
-- Separate assembly `Ndbs.MauiToolkit.Auth` (`net10.0-android|ios|windows`,
-  `UseMaui`), referenced only by apps that need authentication.
+- The base assembly `Ndbs.MauiToolkit.Auth` (`net10.0-android|ios|windows`,
+  `UseMaui`) is **provider-agnostic**: it owns the orchestration
+  (`IAuthenticationService`), the token store, the `IOidcClient` seam and the
+  provider routing (`RoutingOidcClient`, `IActiveIdentityProvider`). It no longer
+  depends on any concrete identity-provider SDK.
 - References `Ndbs.MauiToolkit` (and transitively `Ndbs.MauiToolkit.Core`) — it
-  integrates with the toolkit's environment services and messaging.
-- Pulls in `Duende.IdentityModel.OidcClient` (Authorization Code Flow with PKCE),
+  integrates with the toolkit's environment services and messaging. Pulls in
   `CommunityToolkit.Mvvm` (state notifications) and `Microsoft.Extensions.Http`.
+- Each identity provider is a separate, optional add-on project that references the
+  base and registers itself through the routing seam:
+  - `Ndbs.MauiToolkit.Auth.Ias` — SAP IAS via `Duende.IdentityModel.OidcClient`
+    (Authorization Code Flow with PKCE) and the MAUI system browser; enabled with
+    `AddIas()`.
+- Reference the base plus exactly the provider projects an app needs, so an
+  IAS-only app never pulls in another provider's SDK.
 
 ## How to Use
 
-1. Register the services and configure the identity provider. The configuration is
-   validated eagerly, so missing mandatory parameters fail fast:
+1. Register the services and configure the identity provider. The base registration
+   is provider-agnostic; add the identity provider(s) the app uses (for example IAS)
+   through the returned builder. The configuration is validated eagerly, so missing
+   mandatory parameters fail fast:
 
    ```csharp
    builder.Services.AddNdbsAuth(options =>
@@ -47,7 +62,8 @@ of that concern).
        options.ClientId = "mobile-app";
        options.RedirectUri = "myapp://callback";
        // options.Scopes, options.EnableRpInitiatedLogout, options.Browser, ...
-   });
+   })
+   .AddIas(); // enable the SAP IAS provider (Ndbs.MauiToolkit.Auth.Ias)
    ```
 
 2. Optionally attach the access token to an `HttpClient` automatically:
@@ -78,10 +94,11 @@ of that concern).
 - `IOidcOptionsProvider` exposes an immutable snapshot of `OidcOptions` and allows the
   `Authority` / `ClientId` to be updated at runtime, so the app can point at a
   different identity provider without a restart.
-- `IasIdpComponent` (an `ISystemEnvironmentComponent`) plugs authentication into the
-  toolkit's environment services: on apply it reconfigures the authority and client
-  id from the environment definition; on tear-down it signs the user out, so a session
-  never survives an environment switch.
+- `IasIdpComponent` (an `ISystemEnvironmentComponent` in `Ndbs.MauiToolkit.Auth.Ias`)
+  plugs the IAS provider into the toolkit's environment services: on apply it
+  reconfigures the authority and client id from the environment definition and
+  activates the IAS provider through `IActiveIdentityProvider`; on tear-down it signs
+  the user out, so a session never survives an environment switch.
 
 ## Security
 

@@ -5,7 +5,7 @@ using Microsoft.Maui.Authentication;
 using Ndbs.MauiToolkit.Auth.Configuration;
 using IBrowser = Duende.IdentityModel.OidcClient.Browser.IBrowser;
 
-namespace Ndbs.MauiToolkit.Auth.Maui
+namespace Ndbs.MauiToolkit.Auth.Ias
 {
     /// <summary>
     /// Duende <see cref="IBrowser"/> implementation that drives the interactive
