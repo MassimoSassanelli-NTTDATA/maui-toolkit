@@ -1,0 +1,68 @@
+{
+    "$schema": "./.icc/scheme/project-scheme-2021-11-23.json",
+    "name": "MSS_ConfirmWarehouseTask",
+    "displayname": "MSS_ConfirmWarehouseTask",
+    "description": "ConfirmTasks",
+    "publication": null,
+    "uploadformat": "v2",
+    "formuploadmethod": "v1.3",
+    "forms": [
+        {
+            "name": "MSS_ConfirmWarehouseTask",
+            "displayname": "MSS_ConfirmWarehouseTask",
+            "description": "FilterPage",
+            "path": "./forms/MSS_ConfirmWarehouseTaskFilter.xaml",
+            "completions": [  
+            ],
+            "texts": [
+                "./texts/text.csv"
+            ],
+            "settings": null
+        },
+         {
+            "name": "ConfirmWarehouseTaskWorklist",
+            "displayname": "ConfirmWarehouseTaskWorklist",
+            "description": "WorklistPage",
+            "path": "./forms/MSS_ConfirmWarehouseTaskWorklist.xaml",
+            "completions": [  
+            ],
+            "texts": [
+                "./texts/text.csv"
+            ],
+            "settings": null
+        },
+        {
+            "name": "ConfirmWarehouseTaskJob",
+            "displayname": "ConfirmWarehouseTaskJob",
+            "description": "ProductJobPage",
+            "path": "./forms/MSS_ConfirmWarehouseTaskJob.xaml",
+            "completions": [  
+            ],
+            "texts": [
+                "./texts/text.csv"
+            ],
+            "settings": null
+        },
+            {
+            "name": "ConfirmWarehouseTaskHUJob",
+            "displayname": "ConfirmWarehouseTaskHUJob",
+            "description": "HUJobPage",
+            "path": "./forms/MSS_ConfirmWarehouseTaskHUJob.xaml",
+            "completions": [  
+            ],
+            "texts": [
+                "./texts/text.csv"
+            ],
+            "settings": null
+        }
+    ],
+    "adapterarrangements": null,
+    "customproperties": {
+            "title": "Confirm warehouse task",
+           "category": "warehouse",
+            "translation": "ConfirmWarhouseTask",
+           "icon" : "internal.png",
+           "formName" :"MSS_ConfirmWarehouseTask",
+           "pageName" : "ConfirmWarehouseTaskFilter"
+    }
+}

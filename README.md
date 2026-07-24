@@ -52,6 +52,10 @@ Use this toolkit when your MAUI app needs:
   - curated technical event journaling with enrichment, payload sanitization,
     fan-out sinks (logger + SQLite) and retention controls
   - Docs: [docs/features/event-journal.md](docs/features/event-journal.md)
+- XIA toolkit (optional assembly `Ndbs.MauiToolkit.Xia`)
+  - XIA-specific infrastructure for tenant and micro-app context chain,
+    tenant workspace handling, environment composition, and micro-app sync wiring
+  - Docs: [docs/features/xia-toolkit.md](docs/features/xia-toolkit.md)
 
 ## Developer Documentation
 
@@ -65,6 +69,7 @@ Use this toolkit when your MAUI app needs:
 - [docs/features/dynamic-tables.md](docs/features/dynamic-tables.md)
 - [docs/features/authentication.md](docs/features/authentication.md)
 - [docs/features/event-journal.md](docs/features/event-journal.md)
+- [docs/features/xia-toolkit.md](docs/features/xia-toolkit.md)
 
 ## Quick Start
 

@@ -19,9 +19,7 @@
 		platform-neutral Ndbs.MauiToolkit.Core project reference.
 	-->
 	<ItemGroup>
-		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth\**\*.cs"
-		         Exclude="..\..\src\Ndbs.MauiToolkit.Auth\Maui\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\DependencyInjection\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\bin\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\obj\**\*.cs"
-		         Link="Auth\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth\**\*.cs" Exclude="..\..\src\Ndbs.MauiToolkit.Auth\Maui\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\DependencyInjection\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\bin\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\obj\**\*.cs" Link="Auth\%(RecursiveDir)%(Filename)%(Extension)" />
 		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\MsalEntraClient.cs" Link="Entra\MsalEntraClient.cs" />
 		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\MsalAuthResult.cs" Link="Entra\MsalAuthResult.cs" />
 		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\IMsalPublicClient.cs" Link="Entra\IMsalPublicClient.cs" />
@@ -36,11 +34,14 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-		<PackageReference Include="xunit" Version="2.9.2" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
-		<PackageReference Include="NSubstitute" Version="5.3.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NSubstitute" Version="6.0.0" />
+		<PackageReference Include="xunit.v3" Version="3.2.2" />
 	</ItemGroup>
 
 </Project>

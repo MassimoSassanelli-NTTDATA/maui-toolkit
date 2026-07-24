@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<MauiVersion>10.0.90</MauiVersion>
+	</PropertyGroup>
+
+	<!--
+		The Ndbs.MauiToolkit.Xia library targets platform frameworks
+		(net10.0-android/ios/windows) and cannot be project-referenced from a
+		runnable, platform-neutral unit test project. The units under test are the
+		platform-neutral parts of the library (context, workspace path layout,
+		last-tenant store, start-up resolver and tenant switch coordinator), so the
+		relevant source files are compiled
+		(shared-source) into this test assembly. The MAUI-specific defaults
+		(Preferences/FileSystem), the dependency-injection wiring and the
+		authentication-backed default guard require a platform/identity provider and
+		are excluded here.
+	-->
+	<ItemGroup>
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Xia\**\*.cs" Exclude="..\..\src\Ndbs.MauiToolkit.Xia\DependencyInjection\**\*.cs;..\..\src\Ndbs.MauiToolkit\Workspace\MauiAppDataRootProvider.cs;..\..\src\Ndbs.MauiToolkit\Startup\PreferencesKeyValueStore.cs;..\..\src\Ndbs.MauiToolkit.Xia\Switching\DefaultTenantSwitchGuard.cs;..\..\src\Ndbs.MauiToolkit.Xia\Environments\Components\IasIdpComponent.cs;..\..\src\Ndbs.MauiToolkit.Xia\Environments\Components\LocalDataComponent.cs;..\..\src\Ndbs.MauiToolkit.Xia\Environments\Components\XiaComponent.cs;..\..\src\Ndbs.MauiToolkit.Xia\Environments\Components\XiaConfig.cs;..\..\src\Ndbs.MauiToolkit.Xia\bin\**\*.cs;..\..\src\Ndbs.MauiToolkit.Xia\obj\**\*.cs" Link="Xia\%(RecursiveDir)%(Filename)%(Extension)" />
+		<!-- Types moved from Ndbs.MauiToolkit.Xia to Ndbs.MauiToolkit -->
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Startup\IKeyValueStore.cs" Link="Toolkit\Startup\IKeyValueStore.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Context\IUserContext.cs" Link="Toolkit\Context\IUserContext.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Context\UserContext.cs" Link="Toolkit\Context\UserContext.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Workspace\IAppDataRootProvider.cs" Link="Toolkit\Workspace\IAppDataRootProvider.cs" />
+		<!-- Context chain framework (used by the Xia context stages) -->
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Context\IContextStage.cs" Link="Toolkit\Context\IContextStage.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Context\ContextStageBase.cs" Link="Toolkit\Context\ContextStageBase.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Core\Context\IContextChain.cs" Link="Toolkit\Context\IContextChain.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Ndbs.MauiToolkit.DynamicTables\Ndbs.MauiToolkit.DynamicTables.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.4" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NSubstitute" Version="6.0.0" />
+		<PackageReference Include="xunit.v3" Version="3.2.2" />
+	</ItemGroup>
+
+</Project>

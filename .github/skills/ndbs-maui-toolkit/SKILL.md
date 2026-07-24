@@ -16,7 +16,10 @@ description: >
   AddNdbsAuth, AddNdbsAuthBearerToken, BearerTokenHandler), and the optional
   EventJournal assembly (curated technical event journaling with enrichment,
   sanitization and sinks: AddEventJournal, IEventJournal, IEventSink,
-  IEventEnricher). DO NOT USE
+  IEventEnricher), and the optional Xia assembly (tenant and micro-app context,
+  switching and synchronization infrastructure: UseMauiNdbsXia,
+  ITenantContext, IMicroAppContext, ITenantSwitchCoordinator,
+  AddXiaMicroAppSync). DO NOT USE
   FOR: application-specific domain logic or HTTP/REST/OData clients.
 ---
 
@@ -84,6 +87,12 @@ targets a specific local bug, file, symbol, or runtime behavior.
     `Microsoft.Extensions.DependencyInjection.Abstractions`, and
     `Microsoft.EntityFrameworkCore.Sqlite`. Reference it only from apps that need
     runtime event journaling.
+  - `Ndbs.MauiToolkit.Xia` (`net10.0-android|ios|windows`, `UseMaui`) —
+    **optional** XIA-focused add-on for tenant/micro-app context chain,
+    tenant workspace handling, tenant switching, system-environment composition,
+    and micro-app synchronization wiring. Depends on `Ndbs.MauiToolkit`,
+    `Ndbs.MauiToolkit.Auth`, `Ndbs.MauiToolkit.DynamicTables`, and
+    `NDBS.Xia.Api`.
 - `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
@@ -123,6 +132,8 @@ targets a specific local bug, file, symbol, or runtime behavior.
    `AddIas()`, and `AddNdbsAuthBearerToken()` on an `IHttpClientBuilder`).
   The optional event journal is also explicit opt-in via `AddEventJournal(...)`
   and, when SQLite persistence is needed, `AddEventJournalDatabasePath(...)`.
+  Xia infrastructure is opt-in via `UseMauiNdbsXia(...)` and
+  `AddXiaMicroAppSync(...)`.
 
 ## Capability map
 
@@ -140,6 +151,7 @@ targets a specific local bug, file, symbol, or runtime behavior.
 | **Dynamic tables** (`Ndbs.MauiToolkit.DynamicTables`, optional assembly) | Runtime SQLite table creation + CSV import over an existing EF Core `DbContext`; identifier-validated and parameterized against SQL injection | `AddDynamicTables<TContext>()`, `IDynamicTableRepository`, `IDynamicTableImportService`, `IDynamicTableMemoryCache`, `CsvParser`, `CsvImportOptions`, `CsvImportResult` — see `../../docs/features/dynamic-tables.md` |
 | **Authentication** (`Ndbs.MauiToolkit.Auth` + provider add-ons) | Provider-agnostic OIDC sign-in: orchestration, secure token storage, silent refresh, profile mapping, sign-out, `HttpClient` bearer tokens and per-environment provider routing. Concrete providers are separate optional projects (SAP IAS in `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`; Azure Entra ID in `Ndbs.MauiToolkit.Auth.Entra` via `AddEntra()`); exactly one identity provider is active per environment | base: `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `IActiveIdentityProvider`, `RoutingOidcClient`, `IdentityProviderOidcClient`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage`; IAS: `AddIas()`, `IasIdpComponent`; Entra: `AddEntra()`, `MsalEntraClient`, `EntraIdpComponent` — see `../../docs/features/authentication.md` |
 | **Event journal** (`Ndbs.MauiToolkit.EventJournal`, optional assembly) | Curated technical event journaling with category gating, enrichment, payload sanitization, sink fan-out, timed scopes and SQLite retention | `AddEventJournal(...)`, `AddEventJournalDatabasePath(...)`, `IEventJournal`, `IEventSink`, `IEventEnricher`, `IEventPayloadSanitizer`, `EventJournalOptions`, `EventJournalExtensions.RecordAsync` — see `../../docs/features/event-journal.md` |
+| **Xia toolkit** (`Ndbs.MauiToolkit.Xia`, optional assembly) | XIA-specific tenant and micro-app runtime infrastructure with context-chain stages, workspace handling, switch orchestration, micro-app packaging/sync, and environment composition | `UseMauiNdbsXia(...)`, `AddXiaContextChain()`, `AddXiaTenantStage(order)`, `AddXiaMicroAppStage(order)`, `AddXiaMicroAppSync(...)`, `ITenantContext`, `IMicroAppContext`, `ITenantWorkspaceProvider`, `ITenantSwitchCoordinator` — see `../../docs/features/xia-toolkit.md` |
 
 ## When to reach for what
 
@@ -165,6 +177,11 @@ targets a specific local bug, file, symbol, or runtime behavior.
   `AddEventJournal(...)`, optionally add SQLite persistence with
   `AddEventJournalDatabasePath(...)`, and write events through `IEventJournal`.
   Do not use it as a business event-sourcing or BI analytics store.
+- **Need XIA tenant and micro-app infrastructure?**
+  Reference the optional `Ndbs.MauiToolkit.Xia` assembly, register
+  `UseMauiNdbsXia(...)`, compose context stages with
+  `AddXiaTenantStage(...)`/`AddXiaMicroAppStage(...)`, and enable micro-app sync
+  with `AddXiaMicroAppSync(...)`.
 - **Sign users in against an OIDC identity provider (e.g. SAP IAS) and call protected
   APIs?** Reference the provider-agnostic `Ndbs.MauiToolkit.Auth` base plus the
   provider add-on the app needs (SAP IAS: `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`;

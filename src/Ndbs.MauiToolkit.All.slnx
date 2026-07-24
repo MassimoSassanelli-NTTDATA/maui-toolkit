@@ -6,6 +6,7 @@
     <Project Path="../tests/Ndbs.MauiToolkit.Auth.Ias.Tests/Ndbs.MauiToolkit.Auth.Ias.Tests.csproj" />
     <Project Path="../tests/Ndbs.MauiToolkit.Auth.Entra.Tests/Ndbs.MauiToolkit.Auth.Entra.Tests.csproj" />
     <Project Path="../tests/maui-toolkit.EventJournal.Tests/Ndbs.MauiToolkit.EventJournal.Tests.csproj" />
+    <Project Path="../tests/Ndbs.MauiToolkit.Xia.Tests/Ndbs.MauiToolkit.Xia.Tests.csproj" />
   </Folder>
   <Project Path="Ndbs.MauiToolkit.Core/Ndbs.MauiToolkit.Core.csproj" />
   <Project Path="Ndbs.MauiToolkit/Ndbs.MauiToolkit.csproj" />
@@ -14,4 +15,5 @@
   <Project Path="Ndbs.MauiToolkit.Auth.Ias/Ndbs.MauiToolkit.Auth.Ias.csproj" />
   <Project Path="Ndbs.MauiToolkit.Auth.Entra/Ndbs.MauiToolkit.Auth.Entra.csproj" />
   <Project Path="Ndbs.MauiToolkit.EventJournal/Ndbs.MauiToolkit.EventJournal.csproj" />
+  <Project Path="Ndbs.MauiToolkit.Xia/Ndbs.MauiToolkit.Xia.csproj" />
 </Solution>
