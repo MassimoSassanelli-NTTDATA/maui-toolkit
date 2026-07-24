@@ -14,7 +14,7 @@
 		<!-- AOT/Trimming safety (N1): keep JSON serialization source-generated. -->
 		<IsAotCompatible>true</IsAotCompatible>
 
-		<RootNamespace>Ndbs.MauiToolkit.Auth</RootNamespace>
+		<RootNamespace>Ndbs.MauiToolkit.Auth.Entra</RootNamespace>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
@@ -23,14 +23,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- WeakReferenceMessenger / IMessenger for loosely coupled auth-state notifications (A15). -->
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
+		<!-- MSAL.NET for the Azure Entra ID Authorization Code Flow with PKCE. -->
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.71.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Ndbs.MauiToolkit\Ndbs.MauiToolkit.csproj" />
+		<ProjectReference Include="..\Ndbs.MauiToolkit.Auth\Ndbs.MauiToolkit.Auth.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,11 +1,12 @@
 using Duende.IdentityModel.OidcClient;
 using IBrowser = Duende.IdentityModel.OidcClient.Browser.IBrowser;
 using Microsoft.Extensions.Logging;
+using Ndbs.MauiToolkit.Auth.Client;
 using Ndbs.MauiToolkit.Auth.Configuration;
 using Ndbs.MauiToolkit.Auth.Results;
 using Ndbs.MauiToolkit.Auth.Tokens;
 
-namespace Ndbs.MauiToolkit.Auth.Client
+namespace Ndbs.MauiToolkit.Auth.Ias
 {
     /// <summary>
     /// <see cref="IOidcClient"/> implementation backed by

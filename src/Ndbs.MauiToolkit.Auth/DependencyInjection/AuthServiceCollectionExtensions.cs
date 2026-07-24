@@ -6,9 +6,9 @@ using Ndbs.MauiToolkit.Auth.Configuration;
 using Ndbs.MauiToolkit.Auth.Connectivity;
 using Ndbs.MauiToolkit.Auth.Http;
 using Ndbs.MauiToolkit.Auth.Maui;
+using Ndbs.MauiToolkit.Auth.Providers;
 using Ndbs.MauiToolkit.Auth.Tokens;
 using ISecureStorage = Ndbs.MauiToolkit.Auth.Tokens.ISecureStorage;
-using IBrowser = Duende.IdentityModel.OidcClient.Browser.IBrowser;
 
 namespace Ndbs.MauiToolkit.Auth.DependencyInjection
 {
@@ -49,14 +49,17 @@ namespace Ndbs.MauiToolkit.Auth.DependencyInjection
 
             // Platform infrastructure.
             services.TryAddSingleton<ISecureStorage, MauiSecureStorage>();
-            services.TryAddSingleton<MauiAuthenticatorBrowser>();
-            services.TryAddSingleton<MauiWebViewBrowser>();
-            // The platform browser honours OidcBrowserKind and forces the embedded
-            // web view on Windows (A11).
-            services.TryAddSingleton<IBrowser, MauiPlatformBrowser>();
 
             services.TryAddSingleton<ITokenStore, SecureStorageTokenStore>();
-            services.TryAddSingleton<IOidcClient, DuendeOidcClient>();
+
+            // Provider-agnostic OIDC seam: the active identity provider is selected at
+            // runtime (per environment) and the routing client delegates to it. Each
+            // identity-provider add-on (for example AddIas()) registers one
+            // IdentityProviderOidcClient.
+            services.TryAddSingleton<IActiveIdentityProvider, ActiveIdentityProvider>();
+            services.TryAddSingleton<IOidcClient>(sp => new RoutingOidcClient(
+                sp.GetServices<IdentityProviderOidcClient>(),
+                sp.GetRequiredService<IActiveIdentityProvider>()));
 
             // Singleton so the refresh lock is shared across the whole app (A4).
             services.TryAddSingleton<IAuthenticationService, AuthenticationService>();

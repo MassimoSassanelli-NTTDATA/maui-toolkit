@@ -1,8 +1,9 @@
 using System.Text.Json;
 using Ndbs.MauiToolkit.Auth.Configuration;
+using Ndbs.MauiToolkit.Auth.Providers;
 using Ndbs.MauiToolkit.Environments;
 
-namespace Ndbs.MauiToolkit.Auth.Environments.Components
+namespace Ndbs.MauiToolkit.Auth.Ias
 {
     /// <summary>
     /// Environment component for the IAS identity provider. It reconfigures the OIDC
@@ -15,21 +16,30 @@ namespace Ndbs.MauiToolkit.Auth.Environments.Components
         /// <summary>The section key handled by this component.</summary>
         public const string Section = "IAS";
 
+        /// <summary>The identity-provider routing key for the IAS provider.</summary>
+        public const string ProviderKey = "IAS";
+
         /// <summary>The identity-provider category (exactly one per environment).</summary>
         public const string IdentityProviderCategory = "IdentityProvider";
 
         private readonly IOidcOptionsProvider _oidcOptions;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IActiveIdentityProvider _activeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IasIdpComponent"/> class.
         /// </summary>
         /// <param name="oidcOptions">The runtime OIDC options provider.</param>
         /// <param name="authenticationService">The authentication service (for tear-down).</param>
-        public IasIdpComponent(IOidcOptionsProvider oidcOptions, IAuthenticationService authenticationService)
+        /// <param name="activeProvider">The active-identity-provider state (for provider routing).</param>
+        public IasIdpComponent(
+            IOidcOptionsProvider oidcOptions,
+            IAuthenticationService authenticationService,
+            IActiveIdentityProvider activeProvider)
         {
             _oidcOptions = oidcOptions ?? throw new ArgumentNullException(nameof(oidcOptions));
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+            _activeProvider = activeProvider ?? throw new ArgumentNullException(nameof(activeProvider));
         }
 
         /// <inheritdoc />
@@ -78,12 +88,23 @@ namespace Ndbs.MauiToolkit.Auth.Environments.Components
                 options.ClientId = config.ClientId!;
             });
 
+            // Route sign-in through the IAS (Duende) provider for this environment.
+            _activeProvider.SetActiveProvider(ProviderKey);
+
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public Task ResetAsync(CancellationToken cancellationToken = default) =>
-            _authenticationService.LogoutAsync(cancellationToken: cancellationToken);
+        public Task ResetAsync(EnvironmentSwitchOptions options, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(options);
+
+            // Only sign out when the switch asks for the active session to be reset;
+            // otherwise the session is kept alive across the environment switch.
+            return options.ResetActiveSession
+                ? _authenticationService.LogoutAsync(cancellationToken: cancellationToken)
+                : Task.CompletedTask;
+        }
 
         private static IasConfig? Read(JsonElement section)
         {

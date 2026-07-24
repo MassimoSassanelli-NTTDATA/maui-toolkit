@@ -69,6 +69,8 @@ internal sealed class FakeComponent : ISystemEnvironmentComponent
     public int ApplyCount { get; private set; }
     public int ResetCount { get; private set; }
 
+    public EnvironmentSwitchOptions? LastResetOptions { get; private set; }
+
     public EnvironmentComponentValidation Validate(JsonElement section) =>
         _valid ? EnvironmentComponentValidation.Valid() : EnvironmentComponentValidation.Invalid($"{SectionKey} ungültig");
 
@@ -79,9 +81,10 @@ internal sealed class FakeComponent : ISystemEnvironmentComponent
         return Task.CompletedTask;
     }
 
-    public Task ResetAsync(CancellationToken cancellationToken = default)
+    public Task ResetAsync(EnvironmentSwitchOptions options, CancellationToken cancellationToken = default)
     {
         ResetCount++;
+        LastResetOptions = options;
         _log.Add($"reset:{SectionKey}");
         return Task.CompletedTask;
     }

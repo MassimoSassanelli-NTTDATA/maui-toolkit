@@ -116,5 +116,35 @@ public sealed class SystemEnvironmentSwitchCoordinatorTests : IDisposable
         Assert.Equal(0, idp.ResetCount);
     }
 
+    [Fact]
+    public async Task Switch_ForwardsSwitchOptionsToComponentReset()
+    {
+        var log = new List<string>();
+        var idp = new FakeComponent("IAS", log, category: "IdentityProvider", required: true, order: 10);
+        var coordinator = CreateCoordinator(log, idp);
+        var target = Env("Alpha", "\"IAS\": {}");
+        await _store.AddOrUpdateAsync(target);
+
+        await coordinator.SwitchAsync(target, new EnvironmentSwitchOptions { ResetActiveSession = false });
+
+        Assert.NotNull(idp.LastResetOptions);
+        Assert.False(idp.LastResetOptions!.ResetActiveSession);
+    }
+
+    [Fact]
+    public async Task Switch_WithoutOptions_DefaultsToResetActiveSession()
+    {
+        var log = new List<string>();
+        var idp = new FakeComponent("IAS", log, category: "IdentityProvider", required: true, order: 10);
+        var coordinator = CreateCoordinator(log, idp);
+        var target = Env("Alpha", "\"IAS\": {}");
+        await _store.AddOrUpdateAsync(target);
+
+        await coordinator.SwitchAsync(target);
+
+        Assert.NotNull(idp.LastResetOptions);
+        Assert.True(idp.LastResetOptions!.ResetActiveSession);
+    }
+
     public void Dispose() => _root.Dispose();
 }

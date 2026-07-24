@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<!--
+		Ndbs.MauiToolkit.Auth.Entra targets platform frameworks and cannot be
+		project-referenced from a runnable, platform-neutral unit test project. The
+		platform-neutral units under test (the MSAL-agnostic Entra OIDC client, the
+		Entra environment component and its configuration) are compiled (shared-source)
+		into this test assembly, together with the platform-neutral parts of the base
+		Auth library they depend on. The MSAL adapter and the DI wiring require MSAL and
+		a platform and are excluded here. The environment abstractions come from the
+		platform-neutral Ndbs.MauiToolkit.Core project reference.
+	-->
+	<ItemGroup>
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth\**\*.cs"
+		         Exclude="..\..\src\Ndbs.MauiToolkit.Auth\Maui\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\DependencyInjection\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\bin\**\*.cs;..\..\src\Ndbs.MauiToolkit.Auth\obj\**\*.cs"
+		         Link="Auth\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\MsalEntraClient.cs" Link="Entra\MsalEntraClient.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\MsalAuthResult.cs" Link="Entra\MsalAuthResult.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\IMsalPublicClient.cs" Link="Entra\IMsalPublicClient.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\MsalAuthenticationException.cs" Link="Entra\MsalAuthenticationException.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\EntraConfig.cs" Link="Entra\EntraConfig.cs" />
+		<Compile Include="..\..\src\Ndbs.MauiToolkit.Auth.Entra\EntraIdpComponent.cs" Link="Entra\EntraIdpComponent.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Ndbs.MauiToolkit.Core\Ndbs.MauiToolkit.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+		<PackageReference Include="NSubstitute" Version="5.3.0" />
+	</ItemGroup>
+
+</Project>

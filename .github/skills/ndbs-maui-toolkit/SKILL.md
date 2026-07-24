@@ -55,10 +55,25 @@ targets a specific local bug, file, symbol, or runtime behavior.
     reference it only from apps that need dynamic tabular import. It is independent
     of Core and the MAUI assembly (no project reference between them).
   - `Ndbs.MauiToolkit.Auth` (`net10.0-android|ios|windows`, `UseMaui`) — **optional**
-    add-on for browser-based OIDC sign-in (Authorization Code Flow with PKCE), secure
-    token storage, silent refresh, profile mapping and `HttpClient` bearer-token
-    wiring. References `Ndbs.MauiToolkit` (and transitively Core) and pulls in
-    `Duende.IdentityModel.OidcClient`; reference it only from apps that authenticate.
+    **provider-agnostic** base for OIDC sign-in: orchestration
+    (`IAuthenticationService`), secure token storage, silent refresh, profile mapping,
+    `HttpClient` bearer-token wiring and the provider-routing seam
+    (`RoutingOidcClient` / `IActiveIdentityProvider`). References `Ndbs.MauiToolkit`
+    (and transitively Core); it no longer depends on a concrete identity-provider SDK.
+    Reference it only from apps that authenticate, together with one or more provider
+    add-ons.
+  - `Ndbs.MauiToolkit.Auth.Ias` (`net10.0-android|ios|windows`, `UseMaui`) —
+    **optional** IAS identity-provider add-on for `Ndbs.MauiToolkit.Auth`. Provides
+    the `Duende.IdentityModel.OidcClient`-based client, the MAUI system browser and
+    `IasIdpComponent`; enabled with `AddIas()`. References `Ndbs.MauiToolkit.Auth` and
+    pulls in `Duende.IdentityModel.OidcClient`. Reference it only from apps that use
+    SAP IAS.
+  - `Ndbs.MauiToolkit.Auth.Entra` (`net10.0-android|ios|windows`, `UseMaui`) —
+    **optional** Azure Entra ID identity-provider add-on for `Ndbs.MauiToolkit.Auth`.
+    Provides the MSAL-based `MsalEntraClient` (behind the `IMsalPublicClient` seam) and
+    `EntraIdpComponent`; enabled with `AddEntra()`. References `Ndbs.MauiToolkit.Auth`
+    and pulls in `Microsoft.Identity.Client` (MSAL.NET). Reference it only from apps
+    that use Azure Entra ID.
 - `Nullable` + `ImplicitUsings` enabled.
 - `CommunityToolkit.Mvvm` 8.4 (`ObservableObject`, `[ObservableProperty]`, `AsyncRelayCommand`, `WeakReferenceMessenger`).
 - `CommunityToolkit.Maui` 14.2.
@@ -94,8 +109,8 @@ targets a specific local bug, file, symbol, or runtime behavior.
    `IAppDataRootProvider` → `MauiAppDataRootProvider`,
    the context chain (`AddContextChain()` + stages), the environment services,
    the optional dynamic tables (`AddDynamicTables<TContext>()`), and the optional
-   authentication library (`AddNdbsAuth(...)`, plus `AddNdbsAuthBearerToken()` on an
-   `IHttpClientBuilder`).
+   authentication library (`AddNdbsAuth(...)` plus one provider add-on such as
+   `AddIas()`, and `AddNdbsAuthBearerToken()` on an `IHttpClientBuilder`).
 
 ## Capability map
 
@@ -105,13 +120,13 @@ targets a specific local bug, file, symbol, or runtime behavior.
 | **Navigation & dialogs** (`Ndbs.MauiToolkit.Services`) | Shell navigation and modal alerts/confirms from view models without UI dependencies | `INavigationService.NavigateToAsync(route, parameters?)` / `GoBackAsync(parameters?)`, `IDialogService.ConfirmAsync(...)` / `AlertAsync(...)` |
 | **DI / Startup** (`Ndbs.MauiToolkit`, `.Startup`) | One-call service registration; testable preferences store | `UseMauiNdbsToolkit()`, `IKeyValueStore` / `PreferencesKeyValueStore` |
 | **Context chain** (`Ndbs.MauiToolkit.Context`) | Ordered runtime-context dependency chain (User → Tenant → MicroApp → Form) with activate / deactivate / defer on sign-in, sign-out and level switches | `IContextChain`, `IContextStage`, `ContextStageBase`, `IUserContext` / `UserContext`, `UserContextStage`, `AddContextChain()` / `AddContextStage<T>()` / `AddUserContextStage(order)` — see `references/context-chain.md` |
-| **System environments** (`Ndbs.MauiToolkit.Environments`) | Schema-less environment model, QR/JSON provisioning, startup decision, controlled environment switch with tear-down/apply | `SystemEnvironment`, `ISystemEnvironmentStore` / `JsonFileSystemEnvironmentStore`, `ISystemEnvironmentProvisioningService`, `ISystemEnvironmentStartupResolver`, `ISystemEnvironmentSwitchCoordinator`, `ISystemEnvironmentComponent` — see `references/environments.md` |
+| **System environments** (`Ndbs.MauiToolkit.Environments`) | Schema-less environment model, QR/JSON provisioning, startup decision, controlled environment switch with tear-down/apply; the switch can decide per call whether session-scoped state is reset | `SystemEnvironment`, `ISystemEnvironmentStore` / `JsonFileSystemEnvironmentStore`, `ISystemEnvironmentProvisioningService`, `ISystemEnvironmentStartupResolver`, `ISystemEnvironmentSwitchCoordinator`, `ISystemEnvironmentComponent`, `EnvironmentSwitchOptions` — see `references/environments.md` |
 | **Messaging** (`Ndbs.MauiToolkit.Messaging`) | React to environment switches via `WeakReferenceMessenger` | `EnvironmentChangingMessage(Previous, Target)`, `EnvironmentChangedMessage(Current)` |
 | **Icons** (`Ndbs.MauiToolkit.Icons`) | Platform-native icons (SF Symbols on iOS, Material Symbols on Android/Windows) | `PlatformIconView` (XAML: `IconKey`, `Size`, `Color`), `AppIconCatalog`, `IPlatformIconResolver`, `AddNdbsPlatformIconHandlers()` |
 | **Diff** (`Ndbs.MauiToolkit.Diff`) | Compare a remote and a local list into added / removed / changed / unchanged | `ListDiffAnalyzer<T>(idSelector, isChangedFunc).Calculate(remote, local)` → `DiffDescription<T>` (`DiffTypes`) |
 | **Workspace** (`Ndbs.MauiToolkit.Workspace`) | Abstracted app-data root path (testable over `FileSystem.AppDataDirectory`) | `IAppDataRootProvider` / `MauiAppDataRootProvider` |
 | **Dynamic tables** (`Ndbs.MauiToolkit.DynamicTables`, optional assembly) | Runtime SQLite table creation + CSV import over an existing EF Core `DbContext`; identifier-validated and parameterized against SQL injection | `AddDynamicTables<TContext>()`, `IDynamicTableRepository`, `IDynamicTableImportService`, `IDynamicTableMemoryCache`, `CsvParser`, `CsvImportOptions`, `CsvImportResult` — see `../../docs/features/dynamic-tables.md` |
-| **Authentication** (`Ndbs.MauiToolkit.Auth`, optional assembly) | Browser-based OIDC sign-in (Authorization Code Flow with PKCE), secure token storage, silent refresh, profile mapping, sign-out and `HttpClient` bearer tokens; integrates with the environment services via `IasIdpComponent` | `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage` — see `../../docs/features/authentication.md` |
+| **Authentication** (`Ndbs.MauiToolkit.Auth` + provider add-ons) | Provider-agnostic OIDC sign-in: orchestration, secure token storage, silent refresh, profile mapping, sign-out, `HttpClient` bearer tokens and per-environment provider routing. Concrete providers are separate optional projects (SAP IAS in `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`; Azure Entra ID in `Ndbs.MauiToolkit.Auth.Entra` via `AddEntra()`); exactly one identity provider is active per environment | base: `AddNdbsAuth(...)`, `AddNdbsAuthBearerToken()`, `IAuthenticationService` (`LoginAsync` / `GetAccessTokenAsync` / `LogoutAsync` / `IsAuthenticatedAsync` / `GetUserProfileAsync`), `OidcOptions`, `IOidcOptionsProvider`, `ITokenStore`, `IActiveIdentityProvider`, `RoutingOidcClient`, `IdentityProviderOidcClient`, `UserProfile`, `AuthenticationResult` / `AuthenticationErrorCode`, `BearerTokenHandler`, `AuthenticationStateChangedMessage`; IAS: `AddIas()`, `IasIdpComponent`; Entra: `AddEntra()`, `MsalEntraClient`, `EntraIdpComponent` — see `../../docs/features/authentication.md` |
 
 ## When to reach for what
 
@@ -133,11 +148,13 @@ targets a specific local bug, file, symbol, or runtime behavior.
   `AddDynamicTables<TContext>()` with `IDynamicTableImportService`. Do not use it for
   fixed, known domain schemas — model those as normal EF Core entities.
 - **Sign users in against an OIDC identity provider (e.g. SAP IAS) and call protected
-  APIs?** Reference the optional `Ndbs.MauiToolkit.Auth` assembly, register it with
-  `AddNdbsAuth(...)`, drive the lifecycle through `IAuthenticationService`, and attach
-  tokens with `AddNdbsAuthBearerToken()`. Do not call the OIDC client or platform
-  browser directly, and do not use it as a REST/OData client — read
-  `../../docs/features/authentication.md` first.
+  APIs?** Reference the provider-agnostic `Ndbs.MauiToolkit.Auth` base plus the
+  provider add-on the app needs (SAP IAS: `Ndbs.MauiToolkit.Auth.Ias` via `AddIas()`;
+  Azure Entra ID: `Ndbs.MauiToolkit.Auth.Entra` via `AddEntra()`), register with
+  `AddNdbsAuth(...).AddIas()` (and/or `.AddEntra()`), drive the lifecycle through
+  `IAuthenticationService`, and attach tokens with `AddNdbsAuthBearerToken()`. Do not
+  call the OIDC client or platform browser directly, and do not use it as a REST/OData
+  client — read `../../docs/features/authentication.md` first.
 
 ## Boundaries
 

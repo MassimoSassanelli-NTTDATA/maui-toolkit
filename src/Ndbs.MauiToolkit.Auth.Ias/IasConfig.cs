@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Ndbs.MauiToolkit.Auth.Environments.Components
+namespace Ndbs.MauiToolkit.Auth.Ias
 {
     /// <summary>
     /// The <c>IAS</c> section of a system environment: the identity-provider

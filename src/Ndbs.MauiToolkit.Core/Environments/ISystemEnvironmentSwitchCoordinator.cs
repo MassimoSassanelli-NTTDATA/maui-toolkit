@@ -19,6 +19,18 @@ namespace Ndbs.MauiToolkit.Environments
         Task<EnvironmentSwitchResult> SwitchAsync(SystemEnvironment target, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Switches the active environment to <paramref name="target"/> using explicit
+        /// <paramref name="options"/> that describe the caller's intent (for example
+        /// whether an active user session should be reset). The order is identical to
+        /// <see cref="SwitchAsync(SystemEnvironment, CancellationToken)"/>; the options
+        /// are forwarded to each component's reset.
+        /// </summary>
+        /// <param name="target">The environment to switch to.</param>
+        /// <param name="options">The switch options describing the caller's intent.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        Task<EnvironmentSwitchResult> SwitchAsync(SystemEnvironment target, EnvironmentSwitchOptions options, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Applies the configuration of an already-active environment during startup
         /// without any tear-down (no logout, no cache clearing) and without changing
         /// the persisted selection. Used to re-establish the runtime configuration
